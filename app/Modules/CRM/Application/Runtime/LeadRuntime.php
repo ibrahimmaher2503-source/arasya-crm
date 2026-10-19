@@ -159,7 +159,7 @@ abstract readonly class LeadRuntime
                 $safe[$key] = $metadata[$key];
             } elseif ($key === 'reason_provided' && is_bool($metadata[$key])) {
                 $safe[$key] = $metadata[$key];
-            } elseif ($key === 'encrypted_reason' && is_string($metadata[$key]) && strlen($metadata[$key]) <= 4096) {
+            } elseif ($key === 'encrypted_reason' && is_string($metadata[$key]) && strlen($metadata[$key]) <= 16384) {
                 $safe[$key] = $metadata[$key];
             } elseif ($key === 'kind' && is_string($metadata[$key]) && in_array($metadata[$key], ['stage', 'outcome'], true)) {
                 $safe[$key] = $metadata[$key];

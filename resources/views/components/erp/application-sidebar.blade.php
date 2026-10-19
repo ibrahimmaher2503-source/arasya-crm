@@ -40,7 +40,7 @@
                             ['نظرة عامة', 'Overview', '/crm', 'crm.read'],
                             ['العملاء المحتملون', 'Leads', '/crm/leads', 'crm.read'],
                             ['العملاء والحسابات', 'Customers and accounts', null, null],
-                            ['الصفقات وخط المبيعات', 'Deals and pipeline', app()->environment('testing') && config('sales.synthetic_drafts') ? '/crm/pipeline' : null, 'crm.read'],
+                            ['الصفقات وخط المبيعات', 'Deals and pipeline', app()->environment(['local', 'testing']) && config('sales.synthetic_drafts') ? '/crm/pipeline' : null, 'crm.read'],
                             ['المتابعات والأنشطة', 'Follow-ups and activities', null, null],
                         ]],
                         ['المؤسسة والوصول', 'Organization and access', 'building', [

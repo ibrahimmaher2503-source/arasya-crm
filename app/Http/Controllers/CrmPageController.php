@@ -17,6 +17,12 @@ final readonly class CrmPageController
     public function pipeline(Request $request): View
     {
         $data = $this->directory->pipeline($request);
+        if ($data['customerOptions'] !== null) {
+            return view('crm.pipeline', $this->context($request, 'الصفقات وخط المبيعات', 'Deals and sales pipeline') + $data + [
+                'leadOptions' => array_map(static fn (object $customer): array => (array) $customer, $data['customerOptions']->items()),
+                'leadPaginator' => $data['customerOptions'],
+            ]);
+        }
         $leads = $this->directory->paginate($request, ['q' => $request->query('lead_q'), 'page' => $request->query('lead_page', '1')]);
 
         return view('crm.pipeline', $this->context($request, 'الصفقات وخط المبيعات', 'Deals and sales pipeline') + $data + ['leadOptions' => $leads['data'], 'leadPaginator' => $this->paginator($request, $leads, 'lead_page')]);
@@ -30,6 +36,21 @@ final readonly class CrmPageController
         }
 
         return redirect('/crm/pipeline?'.http_build_query(['locale' => $request->query('locale') === 'en' ? 'en' : 'ar', 'currency' => $data['currency'], 'selected' => $data['id']]));
+    }
+
+    public function transitionOpportunity(Request $request, string $opportunity): JsonResponse|RedirectResponse
+    {
+        $data = $this->directory->transitionOpportunity($request, $opportunity);
+        if ($request->attributes->get('crm_html') !== true) {
+            return response()->json(['data' => $data]);
+        }
+
+        return redirect('/crm/pipeline?'.http_build_query(['locale' => $request->query('locale') === 'en' ? 'en' : 'ar', 'currency' => $data['currency'], 'selected' => $data['id']]));
+    }
+
+    public function reopenOpportunity(Request $request, string $opportunity): never
+    {
+        $this->directory->reopenOpportunity($request, $opportunity);
     }
 
     public function __construct(private LeadDirectory $directory, private AccessControl $access) {}
@@ -153,7 +174,7 @@ final readonly class CrmPageController
     {
         $meta = $result['meta'];
         $paginator = new LengthAwarePaginator($result['data'], $meta['total'], $meta['per_page'], $meta['page'], ['path' => $request->url(), 'pageName' => $pageName]);
-        $paginator->appends($request->only(['locale', 'q', 'kind', 'stage', 'archived', 'per_page', 'source', 'assignee', 'priority', 'status', 'stage_q', 'stage_page', 'outcome_q', 'outcome_page', 'recipient_q', 'recipient_page', 'inbox_page', 'lead_q', 'currency', 'probability_min', 'from', 'to', 'selected', 'closing_page', 'lead_page', 'contact_page', 'proposal_page', 'negotiation_page', 'review_page', 'closed_page']));
+        $paginator->appends($request->only(['locale', 'view', 'opportunity_page', 'q', 'kind', 'stage', 'archived', 'per_page', 'source', 'assignee', 'priority', 'status', 'stage_q', 'stage_page', 'outcome_q', 'outcome_page', 'recipient_q', 'recipient_page', 'inbox_page', 'lead_q', 'currency', 'probability_min', 'from', 'to', 'selected', 'closing_page', 'lead_page', 'contact_page', 'proposal_page', 'negotiation_page', 'review_page', 'closed_page']));
 
         return $paginator;
     }

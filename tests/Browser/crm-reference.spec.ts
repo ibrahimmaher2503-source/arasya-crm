@@ -409,3 +409,262 @@ test('synthetic lead file upload can be downloaded with its original content', a
   }
   expect(Buffer.concat(chunks).toString('utf8')).toBe(fileContents);
 });
+
+test('sales s1 keyed opportunity retains history across reload', async ({ page }, testInfo) => {
+  test.skip(!salesEnabled, 'Requires ARASYA_SYNTHETIC_SALES=true on both the test runner and isolated server.');
+  test.setTimeout(90_000);
+  const fixture = readFixture();
+  const title = `Synthetic keyed opportunity ${randomUUID()}`;
+  const updatedTitle = `Updated ${title}`;
+  await login(page, fixture.manager);
+  await page.setViewportSize({ width: 1672, height: 941 });
+  expect((await page.goto('/crm/pipeline?locale=en'))?.status()).toBe(200);
+
+  await page.getByRole('button', { name: 'Add opportunity', exact: true }).click();
+  const createDialog = page.locator('#opportunity-create');
+  const form = createDialog.locator('form[method="post"]');
+  const submissionKey = await form.locator('[name=submission_key]').inputValue();
+  const csrfToken = await form.locator('[name=_token]').inputValue();
+  expect(submissionKey).toMatch(/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i);
+
+  const businessPayload = {
+    lead_id: fixture.assigned_lead_id,
+    title,
+    amount: '10.25',
+    currency: 'SAR',
+    stage: 'lead',
+    probability: 40,
+    expected_close: '2026-10-31',
+  };
+  const payload = { ...businessPayload, submission_key: submissionKey };
+  const leakedHash = /\b[a-f0-9]{64}\b/i;
+  const headers = { Accept: 'application/json', 'X-CSRF-TOKEN': csrfToken };
+  const endpoint = new URL('/crm/pipeline', page.url()).toString();
+  const created = await page.request.post(endpoint, { headers, data: payload });
+  expect(created.status()).toBe(201);
+  const createdBody = await created.json();
+  const opportunityId = createdBody.data.id as string;
+  expect(opportunityId).toBeTruthy();
+  expect(createdBody.data.version).toBe(0);
+  expect(createdBody.data).not.toHaveProperty('submission_key');
+  expect(createdBody.data).not.toHaveProperty('submission_hash');
+  expect(JSON.stringify(createdBody)).not.toContain(submissionKey);
+  expect(JSON.stringify(createdBody)).not.toMatch(leakedHash);
+
+  const replayed = await page.request.post(endpoint, { headers, data: payload });
+  expect(replayed.status()).toBe(201);
+  const replayedBody = await replayed.json();
+  expect(replayedBody.data.id).toBe(opportunityId);
+  expect(replayedBody.data).not.toHaveProperty('submission_key');
+  expect(replayedBody.data).not.toHaveProperty('submission_hash');
+  expect(JSON.stringify(replayedBody)).not.toContain(submissionKey);
+  expect(JSON.stringify(replayedBody)).not.toMatch(leakedHash);
+
+  const editPayload = { ...businessPayload, title: updatedTitle, version: 0 };
+  const updated = await page.request.patch(`${endpoint}/${opportunityId}`, { headers, data: editPayload });
+  expect(updated.status()).toBe(200);
+  const updatedBody = await updated.json();
+  expect(updatedBody.data).toMatchObject({ id: opportunityId, title: updatedTitle, version: 1 });
+  expect(updatedBody.data).not.toHaveProperty('submission_key');
+  expect(updatedBody.data).not.toHaveProperty('submission_hash');
+  expect(JSON.stringify(updatedBody)).not.toContain(submissionKey);
+  expect(JSON.stringify(updatedBody)).not.toMatch(leakedHash);
+
+  for (const locale of ['ar', 'en'] as const) {
+    for (const { width, height } of [
+      { width: 1672, height: 941 }, { width: 768, height: 1024 }, { width: 390, height: 844 },
+    ]) {
+      await page.setViewportSize({ width, height });
+      const response = await page.goto(`/crm/pipeline?locale=${locale}&selected=${opportunityId}`);
+      expect(response?.status()).toBe(200);
+      expect((await page.reload())?.status()).toBe(200);
+      await expect(page.locator('html')).toHaveAttribute('dir', locale === 'ar' ? 'rtl' : 'ltr');
+      const history = page.locator('[data-opportunity-history]');
+      await expect(history).toBeVisible();
+      await expect(page.getByRole('heading', {
+        name: locale === 'en' ? 'Opportunity history' : 'سجل تغييرات الفرصة', exact: true,
+      })).toBeVisible();
+      await expect(history).toContainText(title);
+      await expect(history).toContainText(updatedTitle);
+      const rows = history.locator('tbody tr');
+      await expect(rows).toHaveCount(2);
+      await expect(rows.nth(0)).toContainText(updatedTitle);
+      await expect(rows.nth(1)).toContainText(title);
+      await expect(page.locator('#opportunity-edit [name=version]')).toHaveValue('1');
+
+      const themeToggle = page.locator('[data-theme-toggle]');
+      await expect(themeToggle).toHaveCount(1);
+      for (const theme of ['light', 'dark'] as const) {
+        const currentTheme = await page.locator('html').getAttribute('data-theme');
+        if ((theme === 'dark' && currentTheme !== 'dark') || (theme === 'light' && currentTheme === 'dark')) {
+          await themeToggle.click();
+        }
+        if (theme === 'dark') await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+        else expect([null, 'light']).toContain(await page.locator('html').getAttribute('data-theme'));
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+        await history.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: testInfo.outputPath(`sales-s1-history-${locale}-${width}-${theme}.png`) });
+      }
+
+      await page.getByRole('button', { name: locale === 'en' ? 'Add opportunity' : 'إضافة صفقة', exact: true }).click();
+      await expect(createDialog).toBeVisible();
+      const newFormKey = await createDialog.locator('[name=submission_key]').inputValue();
+      expect(newFormKey).toMatch(/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i);
+      expect(newFormKey).not.toBe(submissionKey);
+      const markupWithoutNewKey = await page.locator('body').evaluate((body) => {
+        const copy = body.cloneNode(true) as HTMLElement;
+        copy.querySelectorAll('[name="submission_key"]').forEach((input) => input.remove());
+        return copy.innerHTML;
+      });
+      expect(markupWithoutNewKey).not.toContain(submissionKey);
+      expect(markupWithoutNewKey).not.toMatch(leakedHash);
+      await page.keyboard.press('Escape');
+      await expect(createDialog).not.toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    }
+  }
+});
+
+test('sales s1 customer form persists private work context and directory', async ({ page }, testInfo) => {
+  test.skip(!salesEnabled, 'Requires isolated synthetic Sales runtime.');
+  const fixture = readFixture();
+  await login(page, fixture.manager);
+  await page.goto('/crm/pipeline?locale=en');
+  const token = await page.locator('#opportunity-create [name=_token]').inputValue();
+  const headers = { Accept: 'application/json', 'X-CSRF-TOKEN': token };
+  const lead = await page.request.get(`/crm/leads/${fixture.assigned_lead_id}`, { headers });
+  expect(lead.status()).toBe(200);
+  const converted = await page.request.post(`/crm/leads/${fixture.assigned_lead_id}/convert`, {
+    headers, data: { version: (await lead.json()).data.version },
+  });
+  expect(converted.status()).toBe(200);
+  const customerId = (await converted.json()).data.customer_id;
+  await page.getByRole('button', { name: 'Add opportunity', exact: true }).click();
+  await page.getByRole('link', { name: 'Customer source', exact: true }).click();
+  const dialog = page.locator('#opportunity-create');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('link', { name: 'Customer source', exact: true })).toHaveAttribute('aria-current', 'page');
+  const form = dialog.locator('form[method=post]');
+  await form.locator('[name=customer_id]').selectOption(customerId);
+  const title = `Synthetic customer opportunity ${randomUUID()}`;
+  await form.locator('[name=title]').fill(title);
+  await form.locator('[name=amount]').fill('12.50');
+  await form.locator('[name=work_type]').selectOption('site_inspection');
+  await form.locator('[name=requirements]').fill('Private site requirements');
+  await form.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page).toHaveURL(/selected=/);
+  const id = new URL(page.url()).searchParams.get('selected');
+  const editor = page.locator('#opportunity-edit');
+  await expect(editor.locator('[name=requirements]')).toHaveValue('Private site requirements');
+  await editor.locator('[name=work_type]').selectOption('maintenance');
+  await editor.locator('[name=requirements]').fill('Updated private requirements');
+  await editor.getByRole('button', { name: 'Save', exact: true }).click();
+  await page.reload();
+  await expect(editor.locator('[name=work_type]')).toHaveValue('maintenance');
+  await expect(editor.locator('[name=requirements]')).toHaveValue('Updated private requirements');
+  await expect(page.locator('[data-opportunity-history]')).not.toContainText('private requirements');
+  await expect(page.locator('[data-opportunity-history]')).not.toContainText('Private site requirements');
+  for (const locale of ['ar', 'en']) {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`/crm/pipeline?locale=${locale}&view=directory&q=${encodeURIComponent(title)}`);
+    await expect(page.locator('table tbody tr')).toHaveCount(1);
+    await expect(page.locator('table')).toContainText(title);
+    await expect(page.locator('body')).not.toContainText('Updated private requirements');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    await page.locator('table').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: testInfo.outputPath(`sales-s1-directory-${locale}-390.png`) });
+    await page.locator(`a[href*="selected=${id}"]`).click();
+    await expect(page.locator('[data-opportunity-history]')).toBeVisible();
+  }
+  for (let index = 0; index < 25; index++) {
+    const response = await page.request.post('/crm/pipeline', { headers, data: {
+      customer_id: customerId, title: `${title} ${index}`, amount: '1', currency: 'SAR',
+      stage: 'lead', probability: 0, submission_key: randomUUID(),
+    } });
+    expect(response.status()).toBe(201);
+  }
+  await page.goto(`/crm/pipeline?locale=en&q=${encodeURIComponent(title)}`);
+  await page.getByRole('link', { name: 'Opportunity directory', exact: true }).click();
+  await expect(page.getByRole('link', { name: 'Opportunity directory', exact: true })).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('table tbody tr')).toHaveCount(25);
+  await page.locator('a[href*="opportunity_page=2"]').first().click();
+  await expect(page.locator('table tbody tr')).toHaveCount(1);
+  await expect(page.locator('table')).toContainText(title);
+  expect(new URL(page.url()).searchParams.get('q')).toBe(title);
+  expect(new URL(page.url()).searchParams.get('view')).toBe('directory');
+});
+
+test('sales s1 proposed workflow denies commercial closure', async ({ page }) => {
+  test.skip(!salesEnabled, 'Requires ARASYA_SYNTHETIC_SALES=true on both the test runner and isolated server.');
+  test.setTimeout(75_000);
+  const fixture = readFixture();
+  const title = `Synthetic workflow opportunity ${randomUUID()}`;
+  await login(page, fixture.manager);
+  expect((await page.goto('/crm/pipeline?locale=en'))?.status()).toBe(200);
+  await page.getByRole('button', { name: 'Add opportunity', exact: true }).click();
+  const createForm = page.locator('#opportunity-create form[method="post"]');
+  const submissionKey = await createForm.locator('[name=submission_key]').inputValue();
+  expect(submissionKey).toMatch(/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i);
+  const business = { lead_id: fixture.assigned_lead_id, title, amount: '10.25', currency: 'SAR', stage: 'lead', probability: 40, expected_close: '2026-10-31' };
+  const headers = { Accept: 'application/json', 'X-CSRF-TOKEN': await createForm.locator('[name=_token]').inputValue() };
+  const created = await page.request.post(new URL('/crm/pipeline', page.url()).toString(), {
+    headers, data: { ...business, submission_key: submissionKey },
+  });
+  expect(created.status()).toBe(201);
+  const id = (await created.json()).data.id as string;
+  expect(id).toBeTruthy();
+
+  await page.goto(`/crm/pipeline?locale=en&selected=${id}`);
+  const transition = page.locator('[data-opportunity-transition]');
+  const stage = transition.locator('[name=target_stage]');
+  const values = async () => stage.locator('option').evaluateAll(options => options.map(option => (option as HTMLOptionElement).value).filter(Boolean));
+  expect(await values()).toEqual(['contact']);
+  const action = new URL((await transition.getAttribute('action'))!, page.url()).toString();
+  const actionPath = new URL(action).pathname;
+  const forward = page.waitForResponse(response => response.request().method() === 'POST' && new URL(response.url()).pathname === actionPath);
+  await stage.selectOption('contact');
+  await transition.getByRole('button', { name: 'Move opportunity', exact: true }).click();
+  expect([302, 303]).toContain((await forward).status());
+  expect((await page.reload())?.status()).toBe(200);
+  const history = page.locator('[data-opportunity-history] tbody tr');
+  await expect(history).toHaveCount(2);
+  await expect(page.locator('[data-opportunity-transition] [name=version]')).toHaveValue('1');
+
+  const csrf = await page.locator('[data-opportunity-transition] [name=_token]').inputValue();
+  const key = await page.locator('[data-opportunity-transition] [name=submission_key]').inputValue();
+  expect(key).toMatch(/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i);
+  const apiHeaders = { Accept: 'application/json', 'X-CSRF-TOKEN': csrf };
+  for (const [outcome, submissionKey] of [['won', key], ['lost', randomUUID()]]) {
+    expect((await page.request.post(action, {
+      headers: apiHeaders, data: { target_stage: 'closed', outcome, version: 1, submission_key: submissionKey },
+    })).status()).toBe(403);
+  }
+  expect((await page.request.post(new URL(`/crm/pipeline/${id}/reopen`, page.url()).toString(), {
+    headers: apiHeaders, data: { reason: 'Reopen request', version: 1, submission_key: randomUUID() },
+  })).status()).toBe(403);
+  expect((await page.request.patch(new URL(`/crm/pipeline/${id}`, page.url()).toString(), {
+    headers: apiHeaders, data: { ...business, stage: 'closed', version: 1 },
+  })).status()).toBe(422);
+  expect((await page.reload())?.status()).toBe(200);
+  await expect(history).toHaveCount(2);
+  await expect(page.locator('[data-opportunity-transition] [name=version]')).toHaveValue('1');
+
+  const backForm = page.locator('[data-opportunity-transition]');
+  const backStage = backForm.locator('[name=target_stage]');
+  expect((await backStage.locator('option').evaluateAll(options => options.map(option => (option as HTMLOptionElement).value).filter(Boolean))).sort()).toEqual(['lead', 'proposal']);
+  await backStage.selectOption('lead');
+  await backForm.locator('[name=reason]').fill('Correcting the previous stage');
+  const backward = page.waitForResponse(response => response.request().method() === 'POST' && new URL(response.url()).pathname === actionPath);
+  await backForm.getByRole('button', { name: 'Move opportunity', exact: true }).click();
+  expect([302, 303]).toContain((await backward).status());
+  expect((await page.reload())?.status()).toBe(200);
+  await expect(history).toHaveCount(3);
+  await expect(page.locator('[data-opportunity-transition] [name=version]')).toHaveValue('2');
+
+  expect((await page.request.post(action, {
+    headers: apiHeaders, data: { target_stage: 'proposal', reason: '', version: 2, submission_key: randomUUID() },
+  })).status()).toBe(422);
+  expect((await page.reload())?.status()).toBe(200);
+  await expect(history).toHaveCount(3);
+  await expect(page.locator('[data-opportunity-transition] [name=version]')).toHaveValue('2');
+});

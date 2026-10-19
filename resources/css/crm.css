@@ -1142,3 +1142,5 @@
         min-block-size: 2.5rem;
     }
 }
+
+.crm-pipeline-page > * { min-inline-size: 0; max-inline-size: 100%; }

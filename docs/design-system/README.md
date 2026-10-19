@@ -288,3 +288,31 @@ pages replace only authorized choices and pagination, preserving the open dialog
 current selection and transient form fields. Server validation and masking remain
 authoritative; validation failures do not flash private notes. CRM styles own
 content layouts only; shell/sidebar/header dimensions come from the shared shell.
+
+### Opportunity history groundwork
+
+The existing CRM pipeline now composes `ui.detail-panel`, `ui.table` and
+`ui.list-pagination` for authorized selected-opportunity snapshots, newest first
+and25 rows per page. Create forms carry an opaque retry key; it is not a business
+identifier or a visible history field. Direct pipeline sections shrink within the
+shared shell, keeping wide tables locally scrollable at tablet/mobile widths.
+See [Sales S1 evidence](../governance/evidence/sales-s1-foundations.md). This is
+bounded synthetic development and grants no closing, approval or sending rights.
+
+The selected open opportunity also reuses `ui.detail-panel` and existing form
+controls for the proposed development transition flow. Generic editing preserves
+the stage; the separate form lists adjacent open stages and captures a backward
+reason. Closed records expose history only. Backend policy denies closure and
+reopening for every role until the owner approves the authority matrix.
+
+### Bounded opportunity directory and work context
+
+`/crm/pipeline?view=directory` reuses `ui.table` and `ui.list-pagination` with
+25 authorized rows, stable creation/ID ordering and retained filters. The view
+and source links expose their current state visually and with `aria-current`.
+Customer options use the same paginated dialog lookup, limited to canonical
+customers with exactly one visible active linked lead; mutation checks repeat
+that restriction. Optional work type uses the PRD's four commercial work types.
+Private requirements use the existing textarea only in the selected editor;
+list/history/API projections omit them. No new component API, CSS system,
+permission, customer record, site entity or commercial authority was added.

@@ -44,6 +44,17 @@ final readonly class LeadDirectory extends LeadRuntime
         return $this->leadOpportunities->saveOpportunity($request, $id);
     }
 
+    /** @return array<string, mixed> */
+    public function transitionOpportunity(Request $request, string $id): array
+    {
+        return app(LeadOpportunities::class)->transitionOpportunity($request, $id);
+    }
+
+    public function reopenOpportunity(Request $request, string $id): never
+    {
+        app(LeadOpportunities::class)->reopenOpportunity($request, $id);
+    }
+
     public function __construct(
         AccessControl $access,
         private LeadLifecycle $lifecycle,

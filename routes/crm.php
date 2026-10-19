@@ -9,6 +9,8 @@ Route::prefix('crm')->name('crm.')->group(function (): void {
     Route::get('/pipeline', [CrmPageController::class, 'pipeline'])->name('pipeline');
     Route::post('/pipeline', [CrmPageController::class, 'saveOpportunity'])->name('opportunities.store');
     Route::patch('/pipeline/{opportunity}', [CrmPageController::class, 'saveOpportunity'])->name('opportunities.update');
+    Route::post('/pipeline/{opportunity}/transition', [CrmPageController::class, 'transitionOpportunity'])->name('opportunities.transition');
+    Route::post('/pipeline/{opportunity}/reopen', [CrmPageController::class, 'reopenOpportunity'])->name('opportunities.reopen');
     Route::get('/leads/{lead}/files', [CrmFileController::class, 'index'])->name('files.index');
     Route::post('/leads/{lead}/files', [CrmFileController::class, 'store'])->name('files.store');
     Route::get('/leads/{lead}/files/{file}/download', [CrmFileController::class, 'download'])->name('files.download');
