@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "skills": {
+    "laravel-best-practices": {"source":"laravel/boost","sourceType":"github","skillPath":".ai/laravel/skill/laravel-best-practices/SKILL.md","computedHash":"96CEF716F69A2CF587F27EB4F03A4ADFBAFBE58D0F1277CCCAFFDB67BA35C072"},
+    "laravel-specialist": {"source":"jeffallan/claude-skills","sourceType":"github","skillPath":"skills/laravel-specialist/SKILL.md","computedHash":"54d63412e4b4024f384edaa7758e9ad7e76a5ff91a134f8042dbf6200b031800"},
+    "laravel-tdd": {"source":"affaan-m/ecc","sourceType":"github","skillPath":"skills/laravel-tdd/SKILL.md","computedHash":"2b30678c04801d14ef4b0f5449430d1a524222061283b0ee88aec5e77b10d3b3"},
+    "laravel-verification": {"source":"affaan-m/ecc","sourceType":"github","skillPath":"skills/laravel-verification/SKILL.md","computedHash":"a5a1c2fdb15fbfa05f78cdb8368a62b6b4055c44eb56e93e637acf446d3f1a1"},
+    "ponytail": {"source":"dietrichgebert/ponytail","sourceType":"github","skillPath":"skills/ponytail/SKILL.md","computedHash":"dc44b17f49b1228761af8303a51bc028cd1cca866ba8d23d6072ef5fd4e0ba94"},
+    "revops": {"source":"coreyhaines31/marketingskills","sourceType":"github","skillPath":"skills/revops/SKILL.md","computedHash":"f3cdfbb73efd9aca642bb7e7bb9fb074ef2f7fd7059b4503e66fa309b835bf62"},
+    "speckit-analyze": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-analyze/SKILL.md","computedHash":"5a825e9babf81b3f3cefdcc51ab7f84b"},
+    "speckit-baseline": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-baseline/SKILL.md","computedHash":"9583d1a121dd58ed8971e3e49f1a3496a7921fbc73119f57fd761e1313ced622172f4c761"},
+    "speckit-checklist": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-checklist/SKILL.md","computedHash":"0817818e4a050709cbf0c3170cc5c2a7d23ded007edd0c468254c3e850ef632"},
+    "speckit-clarify": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-clarify/SKILL.md","computedHash":"3619640e224205fec6994394e4aa69cc41c14ab703833fb14f13835d3242bb3f"},
+    "speckit-constitution": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-constitution/SKILL.md","computedHash":"c4638f4ad907a4d0a933be0b46a68eff65044a0342013272e7a00bc34703e0f0"},
+    "speckit-converge": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-converge/SKILL.md","computedHash":"47d084c58bdffaec6fda7daca12621b6f683e9d924426ab1686600e8ccb94d4f"},
+    "speckit-implement": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-implement/SKILL.md","computedHash":"cf4248319011209b2610a643e7b6df1aa5d84c12583fcf262caed1387db2eb7a"},
+    "speckit-plan": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-plan/SKILL.md","computedHash":"df3d8e35d3381b245d92e2db896f4001049e11ddeb555bdfe8800ace35b8f3e4"},
+    "speckit-specify": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-specify/SKILL.md","computedHash":"be8644035b9defbb91e1377955267b94761bd0a44dd71bc5cb58759a8e40e5ef"},
+    "speckit-tasks": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-tasks/SKILL.md","computedHash":"bd58faf0cbf8df356ec83acfc7f503b765d03a828348dd59419041e8f35f31e4"},
+    "speckit-taskstoissues": {"source":"dceoy/speckit-agent-skills","sourceType":"github","skillPath":"skills/speckit-taskstoissues/SKILL.md","computedHash":"9e00e728f305fa95719081d68f6de0944adcb369ccb6154f168c6d33f9ee4cf9"},
+    "systematic-debugging": {"source":"obra/superpowers","sourceType":"github","skillPath":"skills/systematic-debugging/SKILL.md","computedHash":"276fb0aadb002ab930cc2a56de89e16995a2e3e70b33552bf0a5fb123148d"},
+    "tdd": {"source":"mattpocock/skills","sourceType":"github","skillPath":"skills/engineering/tdd/SKILL.md","computedHash":"535d1a6f3bd5bded8971e7e4ea76538907cbff6b6d32c39cf97b669869dcd383"}
+  }
+}

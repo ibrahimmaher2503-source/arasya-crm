@@ -1,0 +1,361 @@
+{
+    "driver": "mysql",
+    "server": "11.4.13-MariaDB",
+    "database": "arasya_windows_browser",
+    "tables": [
+        {
+            "TABLE_NAME": "access_audit"
+        },
+        {
+            "TABLE_NAME": "access_branches"
+        },
+        {
+            "TABLE_NAME": "access_companies"
+        },
+        {
+            "TABLE_NAME": "access_departments"
+        },
+        {
+            "TABLE_NAME": "access_department_roles"
+        },
+        {
+            "TABLE_NAME": "access_roles"
+        },
+        {
+            "TABLE_NAME": "access_role_permissions"
+        },
+        {
+            "TABLE_NAME": "access_users"
+        },
+        {
+            "TABLE_NAME": "access_user_permissions"
+        },
+        {
+            "TABLE_NAME": "access_user_roles"
+        },
+        {
+            "TABLE_NAME": "migrations"
+        },
+        {
+            "TABLE_NAME": "tasks_cycle"
+        },
+        {
+            "TABLE_NAME": "tasks_cycle_audit"
+        },
+        {
+            "TABLE_NAME": "tasks_cycle_evidence"
+        },
+        {
+            "TABLE_NAME": "vertical_cycle_records"
+        }
+    ],
+    "access_columns": [
+        {
+            "TABLE_NAME": "access_audit",
+            "COLUMN_NAME": "id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_audit",
+            "COLUMN_NAME": "company_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_audit",
+            "COLUMN_NAME": "actor_id",
+            "IS_NULLABLE": "YES",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_audit",
+            "COLUMN_NAME": "action",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(100)"
+        },
+        {
+            "TABLE_NAME": "access_audit",
+            "COLUMN_NAME": "subject_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(100)"
+        },
+        {
+            "TABLE_NAME": "access_audit",
+            "COLUMN_NAME": "metadata",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "longtext"
+        },
+        {
+            "TABLE_NAME": "access_audit",
+            "COLUMN_NAME": "created_at",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "timestamp"
+        },
+        {
+            "TABLE_NAME": "access_branches",
+            "COLUMN_NAME": "id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_branches",
+            "COLUMN_NAME": "company_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_branches",
+            "COLUMN_NAME": "name",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(200)"
+        },
+        {
+            "TABLE_NAME": "access_branches",
+            "COLUMN_NAME": "code",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(40)"
+        },
+        {
+            "TABLE_NAME": "access_branches",
+            "COLUMN_NAME": "active",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "tinyint(1)"
+        },
+        {
+            "TABLE_NAME": "access_branches",
+            "COLUMN_NAME": "version",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "int(10) unsigned"
+        },
+        {
+            "TABLE_NAME": "access_companies",
+            "COLUMN_NAME": "id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_companies",
+            "COLUMN_NAME": "name",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(200)"
+        },
+        {
+            "TABLE_NAME": "access_companies",
+            "COLUMN_NAME": "version",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "int(10) unsigned"
+        },
+        {
+            "TABLE_NAME": "access_departments",
+            "COLUMN_NAME": "id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_departments",
+            "COLUMN_NAME": "company_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_departments",
+            "COLUMN_NAME": "branch_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_departments",
+            "COLUMN_NAME": "name",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(200)"
+        },
+        {
+            "TABLE_NAME": "access_departments",
+            "COLUMN_NAME": "code",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(40)"
+        },
+        {
+            "TABLE_NAME": "access_departments",
+            "COLUMN_NAME": "active",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "tinyint(1)"
+        },
+        {
+            "TABLE_NAME": "access_departments",
+            "COLUMN_NAME": "version",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "int(10) unsigned"
+        },
+        {
+            "TABLE_NAME": "access_department_roles",
+            "COLUMN_NAME": "company_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_department_roles",
+            "COLUMN_NAME": "branch_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_department_roles",
+            "COLUMN_NAME": "department_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_department_roles",
+            "COLUMN_NAME": "role_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_roles",
+            "COLUMN_NAME": "id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_roles",
+            "COLUMN_NAME": "company_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_roles",
+            "COLUMN_NAME": "name",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(200)"
+        },
+        {
+            "TABLE_NAME": "access_roles",
+            "COLUMN_NAME": "version",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "int(10) unsigned"
+        },
+        {
+            "TABLE_NAME": "access_role_permissions",
+            "COLUMN_NAME": "role_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_role_permissions",
+            "COLUMN_NAME": "permission",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(100)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "company_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "branch_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "department_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "name",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(200)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "email",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(254)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "password",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(255)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "active",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "tinyint(1)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "is_admin",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "tinyint(1)"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "session_version",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "int(10) unsigned"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "version",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "int(10) unsigned"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "created_at",
+            "IS_NULLABLE": "YES",
+            "COLUMN_TYPE": "timestamp"
+        },
+        {
+            "TABLE_NAME": "access_users",
+            "COLUMN_NAME": "updated_at",
+            "IS_NULLABLE": "YES",
+            "COLUMN_TYPE": "timestamp"
+        },
+        {
+            "TABLE_NAME": "access_user_permissions",
+            "COLUMN_NAME": "user_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_user_permissions",
+            "COLUMN_NAME": "permission",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "varchar(100)"
+        },
+        {
+            "TABLE_NAME": "access_user_permissions",
+            "COLUMN_NAME": "allowed",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "tinyint(1)"
+        },
+        {
+            "TABLE_NAME": "access_user_roles",
+            "COLUMN_NAME": "user_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        },
+        {
+            "TABLE_NAME": "access_user_roles",
+            "COLUMN_NAME": "role_id",
+            "IS_NULLABLE": "NO",
+            "COLUMN_TYPE": "char(26)"
+        }
+    ],
+    "employee_tables": []
+}

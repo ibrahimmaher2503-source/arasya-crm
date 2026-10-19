@@ -1,0 +1,13 @@
+{
+  "name": "new_arasya-crm",
+  "private": true,
+  "scripts": {
+    "test:browser": "playwright test",
+    "test:design-system": "playwright test design-system.spec.ts",
+    "check:design-system": "node scripts/check-design-system.mjs && node scripts/test-design-system-check.mjs && node --check resources/js/design-system.js",
+    "check": "npm run check:design-system"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}

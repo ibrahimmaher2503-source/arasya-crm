@@ -1,0 +1,44 @@
+# Local environment secrets (keep the shareable example)
+.env
+.env.*
+!.env.example
+
+# Dependency directories
+/.tools/
+/vendor/
+/node_modules/
+
+# Local QA credentials, databases, browser output and recovery helpers
+/.local/
+/playwright-report/
+/test-results/
+
+# Laravel-generated build and runtime files
+/bootstrap/cache/*.php
+/public/build/
+/public/hot
+/storage/*.key
+/storage/app/private/
+/storage/app/public/
+/storage/framework/cache/data/
+/storage/framework/sessions/
+/storage/framework/testing/
+/storage/framework/views/
+/storage/logs/
+/.phpunit.cache/
+/.phpunit.result.cache
+/coverage/
+
+# OS and editor temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# Private runtime output and local backups
+/storage/debugbar/
+*.sqlite
+*.sqlite3
+*.tmp

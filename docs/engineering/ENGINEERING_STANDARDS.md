@@ -1,0 +1,14 @@
+# معايير الهندسة
+Laravel مؤكد، النسخة وPHP runtime وpackages Proposed حتى قرار ADR. تفضيل تقييم package-first قبل إعادة بناء الوظائف الشائعة Confirmed من المستخدم كسياسة غير ملزمة؛ لا يعتمد package أو stack ولا يفرض تثبيت dependencies. راجع [استراتيجية الحزم](../architecture/PACKAGE_STRATEGY.md). layout مقترح `app/Modules/{Module}/{Domain,Application,Infrastructure,Presentation}` و`tests/{Unit,Feature,Contract}`. كل aggregate له مالك واحد؛ controllers رفيعة، FormRequest للتحقق الشكلي، policies للسجل والحقل، application service للمعاملة، domain guards للانتقال. منع DB writes عبر modules وEloquent relationships التي تتجاوز scope.
+
+استخدم أسماء صريحة <=60 chars للجداول/indexes/FKs مع check migration. stable opaque IDs اختيار UUID/ULID ينتظر ADR؛ foreign keys وentity dimension لكل business aggregate. money decimal مع currency وrounding policy معتمدة، لا float؛ quantity decimal بوحدة وتحويل معتمد OPEN-04. UTC للتخزين ومحلي للعرض. لا soft-delete لقيد posted أو stock movement؛ reversal مرجعي. master-data archive يمنع كسر history.
+
+transaction تجمع aggregate/outbox/audit؛ uniqueness يمنع duplicate business key. lock order ثابت واختبارات concurrent requests؛ retries محدودة وidempotent. لا provider network call داخل transaction طويلة. dependencies inject عبر interfaces. secrets/config من environment/config service ولا getenv متفرق داخل domain.
+
+migrations forward-compatible: expand ثم backfill ثم switch ثم contract لاحق؛ rollback الذي يفقد posted data ممنوع. تجربة snapshot/restoration وبيانات representative قبل production. composer lock بعد اعتماد stack فقط. توثيق invariants وcontracts بجوار module.
+
+Checks مستقبلية بعد scaffolding: `vendor/bin/pint --test`، `vendor/bin/phpstan analyse` باستخدام PHPStan/Larastan بعد اعتماد الإصدارات، `php artisan test`، migration dry-run/forward checks في disposable DB. AST/CodeGraph اختياري إذا متوافق، لا بوابة مزعومة. كل command وexit code وartifact يُسجلان؛ وثائق الحزمة لا تثبت نجاحها الآن.
+
+## تغطية أدوات AI لكل ميزة
+
+كل ميزة أعمال جديدة أو متغيرة تسجل coverage entry بالتزامن مع تنفيذ module owner: عقد tool typed/versioned وhandler إلى **نفس ApplicationService** وسياسة UI/API نفسها، أو استثناء `Restricted/disabled` / `N/A` مسبب، مع إدخال allowlist مركزي واختبارات الوحدة/الصلاحيات/الكشف المناسبة. الميزة غير مكتملة assistant coverage من schema فقط. لا auto-discovery/reflection أو generic execute؛ read tools كذلك تُقيّد قبل counts/pages/aggregates/exports. يظل التنفيذ معطلاً حتى موافقات النطاق والأمن والسياسة. راجع [معمارية المساعد](../architecture/AI_ASSISTANT_ARCHITECTURE.md) و[سجل التغطية وDefinition of Done لكل feature](AI_TOOL_COVERAGE.md).

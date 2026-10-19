@@ -1,0 +1,9 @@
+parameters:
+    level: 8
+    paths:
+        - app/Modules
+        - app/Providers
+        - app/Http/Middleware
+        - app/Shared
+    bootstrapFiles:
+        - vendor/autoload.php

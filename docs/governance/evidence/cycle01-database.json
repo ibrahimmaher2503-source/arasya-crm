@@ -1,0 +1,44 @@
+{
+    "driver": "mysql",
+    "server": "11.4.13-MariaDB",
+    "database": "arasya_windows_browser",
+    "synthetic_company_id": "01M545115JNWFSWA827S5CXKET",
+    "access_companies": 1,
+    "access_branches": 7,
+    "access_departments": 7,
+    "access_users": 5,
+    "access_roles": 6,
+    "access_audit": 44,
+    "remaining_role_assignments": 0,
+    "audit_actions": [
+        {
+            "action": "access.assigned",
+            "total": 8
+        },
+        {
+            "action": "auth.login",
+            "total": 10
+        },
+        {
+            "action": "auth.logout",
+            "total": 4
+        },
+        {
+            "action": "organization.branch.created",
+            "total": 6
+        },
+        {
+            "action": "organization.department.created",
+            "total": 6
+        },
+        {
+            "action": "role.created",
+            "total": 6
+        },
+        {
+            "action": "user.created",
+            "total": 4
+        }
+    ],
+    "audit_actor_and_time_complete": true
+}

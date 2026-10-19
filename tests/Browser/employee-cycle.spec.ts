@@ -1,0 +1,63 @@
+import { test, expect, Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+async function login(page: Page, user: {email: string; password: string}) {
+  await page.goto('/login');
+  await page.locator('input[name=email]').fill(user.email);
+  await page.locator('input[name=password]').fill(user.password);
+  await page.locator('button[type=submit]').click();
+  await page.waitForURL(url => !url.pathname.startsWith('/login'));
+}
+
+test('persisted employee UI and supervisor evidence with real login', async ({ page, browser }, info) => {
+  const fixture = JSON.parse(readFileSync(resolve('storage/framework/testing/employee-fixture.json'), 'utf8'));
+  const suffix = `${info.project.name.startsWith('mobile') ? 'mobile' : 'desktop'}-${Date.now().toString(36)}`;
+  await login(page, fixture.admin);
+  await page.goto('/employees/create?locale=en&manager_q=Synthetic%20supervisor');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  await page.locator('#employee-code').fill(`BROWSER-WORKER-${suffix}`);
+  await page.locator('#employee-name').fill(`Browser worker ${suffix}`);
+  await page.locator('#employee-role').fill('Technician');
+  await page.locator('#employee-branch-id').selectOption(fixture.branch_id);
+  await page.locator('#employee-department-id').selectOption(fixture.department_id);
+  await page.locator('#employee-manager-id').selectOption(fixture.manager_id);
+  await page.locator('#employee-hire-date').fill('2026-01-01');
+  await page.locator('#employee-private-notes').fill('SYNTHETIC-PRIVATE-NOTE');
+  await page.getByRole('button', {name: 'Save employee', exact: true}).click();
+  await page.waitForURL(/\/employees\/[^/?]+\?locale=en/);
+  const workerUrl = new URL(page.url()).pathname;
+  await page.reload();
+  await expect(page.getByText(`Browser worker ${suffix}`, {exact: true})).toBeVisible();
+  await expect(page.getByRole('region', {name: 'Login account', exact: true}).getByText('Worker without a login account', {exact: true})).toBeVisible();
+  await page.goto(workerUrl + '?locale=ar');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await page.keyboard.press('Tab');
+  expect(await page.evaluate(() => document.activeElement?.tagName !== 'BODY')).toBeTruthy();
+  await page.screenshot({path: info.outputPath('employee-profile-rtl.png'), fullPage: true});
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBeTruthy();
+  const supervisor = await browser.newContext({viewport: page.viewportSize()!});
+  const workerPage = await supervisor.newPage();
+  await login(workerPage, fixture.supervisor);
+  await workerPage.goto(workerUrl + '?locale=en');
+  const csrf = await workerPage.locator('input[name=_token]').first().inputValue();
+  const taskResponse = await workerPage.request.post('/tasks', {data: {_token: csrf, title: `Worker job ${suffix}`, priority: 'normal', due_at: '2026-12-01', idempotency_key: `employee-browser-${suffix}`}, headers: {Accept: 'application/json'}});
+  expect(taskResponse.status()).toBe(201);
+  const taskId = (await taskResponse.json()).data.id;
+  await workerPage.goto(workerUrl + '?locale=en&tab=evidence&task_id=' + taskId);
+  await expect(workerPage.getByText('SYNTHETIC-PRIVATE-NOTE', {exact: true})).toHaveCount(0);
+  await workerPage.locator('#employee-job-id').selectOption(taskId);
+  await workerPage.locator('#employee-evidence-note').fill(`Attributed evidence ${suffix}`);
+  await workerPage.getByRole('button', {name: 'Record work evidence', exact: true}).click();
+  await workerPage.reload();
+  await expect(workerPage.getByText(`Attributed evidence ${suffix}`, {exact: false})).toBeVisible();
+  const denied = await browser.newContext();
+  const other = await denied.newPage();
+  await login(other, fixture.other);
+  const forbidden = await other.request.get(workerUrl, {headers: {Accept: 'application/json'}});
+  expect([403, 404]).toContain(forbidden.status());
+  await denied.close();
+  await supervisor.close();
+});

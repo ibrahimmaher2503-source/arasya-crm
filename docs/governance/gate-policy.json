@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "model": "Founder-Led",
+  "founder_authority": "Ibrahim",
+  "gates": {
+    "DEVELOPMENT": "Founder-approved architecture or policy permits isolated implementation with synthetic data.",
+    "INTEGRATION": "Feature tests, authorization checks, business invariants and technical review are required.",
+    "PRODUCTION": "Security, legal, financial and operational readiness are required for the actual deployment."
+  },
+  "task_gate_overrides": [],
+  "development_authorizations": [
+    {
+      "task_id": "A0-ARCH-902",
+      "decisions": [
+        "ADR-002",
+        "ADR-003"
+      ],
+      "authority": "Ibrahim",
+      "capacity": "Executive Decision Authority; Engineering Decision Authority; Product Owner",
+      "evidence": "docs/governance/evidence/FOUNDER-LED-GOVERNANCE.md",
+      "scope": "Bounded local implementation with synthetic data only"
+    },
+    {
+      "task_id": "A0-ARCH-003",
+      "decisions": [
+        "ADR-003"
+      ],
+      "authority": "Ibrahim",
+      "capacity": "Executive Decision Authority; Engineering Decision Authority; Product Owner",
+      "evidence": "docs/governance/evidence/FOUNDER-LED-GOVERNANCE.md",
+      "scope": "Bounded local implementation with synthetic data only"
+    },
+    {
+      "task_id": "A0-CORE-007",
+      "decisions": [
+        "ADR-003"
+      ],
+      "authority": "Ibrahim",
+      "capacity": "Executive Decision Authority; Engineering Decision Authority; Product Owner",
+      "evidence": "docs/governance/evidence/FOUNDER-LED-GOVERNANCE.md",
+      "scope": "Bounded local implementation with synthetic data only"
+    },
+    {
+      "task_id": "A0-SEC-005",
+      "decisions": [
+        "OPEN-02"
+      ],
+      "authority": "Ibrahim",
+      "capacity": "Executive Decision Authority; Engineering Decision Authority; Product Owner",
+      "evidence": "docs/governance/evidence/FOUNDER-LED-GOVERNANCE.md",
+      "scope": "Approval-engine foundation with explicit synthetic test policies; live limits remain gated"
+    },
+    {
+      "task_id": "A2-SALE-011",
+      "decisions": [
+        "OPEN-02"
+      ],
+      "authority": "Ibrahim",
+      "capacity": "Product Owner; bounded local development authority",
+      "evidence": "docs/governance/evidence/crm-reference-development.md",
+      "scope": "Synthetic isolated local drafts only. No approval or external sending. Expires on owner revocation, bounded development completion, or formal policy adoption; no integration/production inheritance."
+    },
+    {
+      "task_id": "A1-CRM-020",
+      "decisions": [
+        "OPEN-02"
+      ],
+      "authority": "Ibrahim",
+      "capacity": "Product Owner; bounded local development authority",
+      "evidence": "docs/governance/evidence/crm-reference-development.md",
+      "scope": "Synthetic isolated local drafts only. No approval or external sending. Expires on owner revocation, bounded development completion, or formal policy adoption; no integration/production inheritance."
+    }
+  ]
+}
